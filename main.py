@@ -50,9 +50,7 @@ def update_cytoscape_layout(layout):
               [Input('cytoscape', 'tapNodeData')],
               [State('cytoscape', 'elements')])
 def generate_elements(nodeData, elements):
-    double_click_check=nodeData
-    nodeData='0'
-    if double_click_check==nodeData:
+    if nodeData:
         new_nodes,new_edges=get_related(nodeData['id'],10,0)
         for node in new_nodes:
             elements.append(node)
