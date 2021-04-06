@@ -29,3 +29,6 @@ def get_related(artist_id,depth,width=0):
         edges.append({'data': {'source': artist_id, 'target': x['uri'][15:]}})
     return nodes,edges
 
+def get_artist(artist_id):
+    a = sp.artist(artist_id)
+    return {'data': {'id': a['uri'][15:], 'label': a['name'],'url':a['images'][1]['url']}}

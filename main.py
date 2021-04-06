@@ -1,6 +1,6 @@
 import dash
 from dash.dependencies import Input, Output,State
-from get_related import get_related
+from get_related import get_artist, get_related
 import dash_html_components as html
 import pprint as pp
 import dash_cytoscape as cyto
@@ -9,16 +9,17 @@ app = dash.Dash(__name__)
 cyto.load_extra_layouts()
 app.layout = html.Div(children=[
         html.Div(
-            children=[html.Div(
+            children=[html.Div(children=[dcc.Input(id="link-input", type="text",style={'width':'100%'}, placeholder="Enter your favorite artist's Spotify URL", debounce=True),
                 cyto.Cytoscape(
                     id='cytoscape',
                     layout={'name': 'breadthfirst'},
                     style={'width': '100%', 'height': '1000px'},
-                    elements=[
-                        {'data': {'id': '2h93pZq0e7k5yf4dywlkpM', 'label': 'Frank Ocean','url':'https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'}},
-                    ]
-                    ),style={'float':'left','width':'70%'}),
-                    html.Div(children=[html.Div(html.Img(height='320',width='320',id='Artist-Image',src='https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'),style={'margin':'auto','width':'50%'}),dcc.Dropdown(
+                    elements=[]
+                    )],style={'float':'left','width':'70%'}),
+                    html.Div(children=[html.Div(id='artist-info-div', children=[
+                        html.Img(height='320',width='320',id='Artist-Image',src='https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'),
+                        html.Div(id='artist-info')],style={'margin':'auto','width':'50%'}),
+                    dcc.Dropdown(
                         id='dropdown-layout',
                         value='cola',
                         options=[
@@ -45,11 +46,23 @@ app.layout = html.Div(children=[
 def update_cytoscape_layout(layout):
     return {'name': layout}
 
+@app.callback(
+    Output('artist-info', 'children'),
+    [Input('cytoscape','mouseoverNodeData')]
+)
+def update_output_div(input_value):
+    return 'Output: {}'.format(input_value)
+
 @app.callback(Output('cytoscape', 'elements'),
-              [Input('cytoscape', 'tapNodeData')],
+              [Input('cytoscape', 'tapNodeData'),
+              Input('link-input', 'value')],
               [State('cytoscape', 'elements')])
-def generate_elements(nodeData, elements):
-    if nodeData:
+def generate_elements(nodeData,artistURL, elements):
+    ctx = dash.callback_context
+    if ctx.triggered[0]['prop_id']=='link-input.value':
+        elements = [get_artist(artistURL)]
+        pass
+    elif ctx.triggered[0]['prop_id']=='cytoscape.tapNodeData':
         new_nodes,new_edges=get_related(nodeData['id'],10,0)
         for node in new_nodes:
             elements.append(node)
