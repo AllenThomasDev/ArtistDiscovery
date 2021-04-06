@@ -7,19 +7,18 @@ import dash_cytoscape as cyto
 import dash_core_components as dcc
 app = dash.Dash(__name__)
 cyto.load_extra_layouts()
-app.layout = html.Div([
+app.layout = html.Div(children=[
         html.Div(
-            className='eight columns', 
-            children=[
+            children=[html.Div(
                 cyto.Cytoscape(
                     id='cytoscape',
                     layout={'name': 'breadthfirst'},
                     style={'width': '100%', 'height': '1000px'},
                     elements=[
-                        {'data': {'id': '2h93pZq0e7k5yf4dywlkpM', 'label': 'Frank Ocean'}},
+                        {'data': {'id': '2h93pZq0e7k5yf4dywlkpM', 'label': 'Frank Ocean','url':'testing'}},
                     ]
-                    ),
-                    dcc.Dropdown(
+                    ),style={'float':'left','width':'70%'}),
+                    html.Div(children=[html.Img(src='https://i.scdn.co/image/67497c55a766af3f57860c88562314a313fc137c'),dcc.Dropdown(
                         id='dropdown-layout',
                         value='cose',
                         options=[
@@ -37,7 +36,7 @@ app.layout = html.Div([
                             {'label':'euler','value':'euler'}
 
                         ]
-                    )]
+                    )],style={'float':'left','width':'30%'})]
                 )
                     ])
 
@@ -56,11 +55,6 @@ def generate_elements(nodeData, elements):
             elements.append(node)
         for edge in new_edges:
             elements.append(edge)
-        pp.pprint(new_nodes)
-        # elements.append({'data': {'id': 'two', 'label': 'two'}})
-        # elements.append({'data': {'source': '2h93pZq0e7k5yf4dywlkpM', 'target': 'two'}})
-        print(elements)
-        print(nodeData)
     return elements
 
 if __name__ == '__main__':

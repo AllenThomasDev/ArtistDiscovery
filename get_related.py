@@ -1,11 +1,9 @@
 import spotipy
 import spotipy.util as util
-import pprint as pp
-import pandas as pd
-from tabulate import tabulate 
-user_id = 'YOUR_SPOTIFY_USER_ID'
-client_id='API_CLIENT_ID'
-client_secret='API_SECRET_KEY'
+from credentials import credentials
+user_id=credentials['user_id']
+client_id=credentials['client_id']
+client_secret=credentials['client_secret']
 token = util.prompt_for_user_token(user_id,
                                    'user-follow-read',
                                    client_id=client_id,
