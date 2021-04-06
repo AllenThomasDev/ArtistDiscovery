@@ -24,7 +24,8 @@ def get_related(artist_id,depth,width=0):
     r=(sp.artist_related_artists(artist_id)['artists'][0:depth])
     a = sp.artist(artist_id)
     for x in r:
-        nodes.append({'data': {'id': x['uri'][15:], 'label': x['name'],'url':x['images'][0]['url']}})
+        nodes.append({'data': {'id': x['uri'][15:], 'label': x['name'],'url':x['images'][1]['url']}})
         edges.append({'data': {'source': artist_id, 'target': x['uri'][15:]}})
-    print(nodes[0])
     return nodes,edges
+
+get_related('2h93pZq0e7k5yf4dywlkpM',10)

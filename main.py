@@ -15,12 +15,12 @@ app.layout = html.Div(children=[
                     layout={'name': 'breadthfirst'},
                     style={'width': '100%', 'height': '1000px'},
                     elements=[
-                        {'data': {'id': '2h93pZq0e7k5yf4dywlkpM', 'label': 'Frank Ocean','url':'testing'}},
+                        {'data': {'id': '2h93pZq0e7k5yf4dywlkpM', 'label': 'Frank Ocean','url':'https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'}},
                     ]
                     ),style={'float':'left','width':'70%'}),
-                    html.Div(children=[html.Img(src='https://i.scdn.co/image/67497c55a766af3f57860c88562314a313fc137c'),dcc.Dropdown(
+                    html.Div(children=[html.Div(html.Img(height='320',width='320',id='Artist-Image',src='https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'),style={'margin':'auto','width':'50%'}),dcc.Dropdown(
                         id='dropdown-layout',
-                        value='cose',
+                        value='cola',
                         options=[
                             {'label':'random','value':'random'},
                             {'label':'grid','value':'grid'},
@@ -56,6 +56,12 @@ def generate_elements(nodeData, elements):
         for edge in new_edges:
             elements.append(edge)
     return elements
+
+@app.callback(Output('Artist-Image', 'src'),
+              [Input('cytoscape', 'mouseoverNodeData')])
+def generate_image(mouseoverNodeData):
+    if mouseoverNodeData:
+        return mouseoverNodeData['url']
 
 if __name__ == '__main__':
     app.run_server(debug=True)
