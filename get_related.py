@@ -45,4 +45,11 @@ def search_by_name(artist_name):
         l.append({'label':artist['name'],'value':artist['id']})
     return l
         
+def get_top_tracks(artist_id):
+    l=[]
+    a=sp.artist_top_tracks(artist_id)
+    for track in a['tracks'][:10]:
+        l.append({'name':track['name'],'audio':track['preview_url'],'cover_art':track['album']['images'][0]['url']})
+    return l
+    pass
 

@@ -1,12 +1,15 @@
 import dash
 from dash.dependencies import Input, Output,State
-from get_related import get_artist, get_related, get_detailed_artist, search_by_name
+from dash_html_components.Audio import Audio
+from get_related import *
 import dash_html_components as html
 import pprint as pp
 import dash_cytoscape as cyto
 import dash_core_components as dcc
-app = dash.Dash(__name__)
+app = dash.Dash(__name__,suppress_callback_exceptions=True)
 cyto.load_extra_layouts()
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+song_dict={}
 app.layout = html.Div(children=[
         html.Div(
             children=[html.Div(children=[dcc.Dropdown(id="link-input",style={'width':'100%'}, value='fra',placeholder="Who is your favorite Artist?",options=[]),
@@ -18,7 +21,11 @@ app.layout = html.Div(children=[
                     )],style={'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
                         html.Img(height='320',width='320',id='Artist-Image',src='/assets\images\Question-Mark-PNG-Picture.png'),
-                        html.Div(id='artist-info')],style={'margin':'auto','width':'50%'}),
+                        html.Audio(id='preview-audio'),
+                        html.Div(
+                            children=[
+                                dcc.RadioItems(id='song-list',options=[])
+                            ],id='artist-info')],style={'margin':'auto','width':'50%'}),
                     dcc.Dropdown(
                         id='dropdown-layout',
                         value='cola',
@@ -51,13 +58,16 @@ def update_cytoscape_layout(layout):
     [Input('cytoscape','mouseoverNodeData')]
 )
 def update_output_div(input_value):
+    l=[]
+    song_options=[]
     if input_value:
-        l=[]
-        print(input_value)
         a=get_detailed_artist(input_value['id'])
-        print(a)
-        l.append(html.H3(a['name']))
-        return html.H1(l)
+        l.append(html.H3(f"{a['name']}'s top tracks are -"))
+        for track in get_top_tracks(input_value['id']):
+            if track['audio'] != None:
+                song_options.append({'label':track['name'],'value':track['audio']})
+    l.append(dcc.RadioItems(id='song-list',options=song_options,labelStyle={'display': 'block'}))
+    return l
 
 @app.callback(Output('cytoscape', 'elements'),
               [Input('cytoscape', 'tapNodeData'),
@@ -76,13 +86,13 @@ def generate_elements(nodeData,artistURL, elements):
             elements.append(edge)
     return elements
 
-@app.callback(Output('Artist-Image', 'src'),
+
+@app.callback(Output('preview-audio', 'src'),
               [Input('cytoscape', 'mouseoverNodeData')])
 def generate_image(mouseoverNodeData):
     if mouseoverNodeData:
         return mouseoverNodeData['url']
     return 'assets\images\Question-Mark-PNG-Picture.png'
-
 
 @app.callback(Output('link-input', 'options'),
               [Input('link-input', 'search_value')])
