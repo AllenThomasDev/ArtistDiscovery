@@ -105,7 +105,6 @@ def generate_image(mouseoverNodeData):
 @app.callback(Output('preview-audio', 'src'),
               [Input('song-list', 'value')])
 def generate_image(song_url):
-    print(song_url)
     return song_url
     
 @app.callback(Output('link-input', 'options'),
