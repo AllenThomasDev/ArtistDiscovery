@@ -36,3 +36,13 @@ def get_artist(artist_id):
 def get_detailed_artist(artist_id):
     a = sp.artist(artist_id)
     return a
+
+def search_by_name(artist_name):
+    l=[]
+    d={}
+    a=sp.search(artist_name,type="artist")
+    for artist in a['artists']['items']:
+        l.append({'label':artist['name'],'value':artist['id']})
+    return l
+        
+

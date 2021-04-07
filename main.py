@@ -1,6 +1,6 @@
 import dash
 from dash.dependencies import Input, Output,State
-from get_related import get_artist, get_related, get_detailed_artist
+from get_related import get_artist, get_related, get_detailed_artist, search_by_name
 import dash_html_components as html
 import pprint as pp
 import dash_cytoscape as cyto
@@ -9,7 +9,7 @@ app = dash.Dash(__name__)
 cyto.load_extra_layouts()
 app.layout = html.Div(children=[
         html.Div(
-            children=[html.Div(children=[dcc.Input(id="link-input", type="text",style={'width':'100%'}, placeholder="Enter your favorite artist's Spotify URL", debounce=True),
+            children=[html.Div(children=[dcc.Dropdown(id="link-input",style={'width':'100%'}, value='fra',placeholder="Who is your favorite Artist?",options=[]),
                 cyto.Cytoscape(
                     id='cytoscape',
                     layout={'name': 'breadthfirst'},
@@ -82,6 +82,16 @@ def generate_image(mouseoverNodeData):
     if mouseoverNodeData:
         return mouseoverNodeData['url']
     return 'assets\images\Question-Mark-PNG-Picture.png'
+
+
+@app.callback(Output('link-input', 'options'),
+              [Input('link-input', 'search_value')])
+def populate_dropdown(search_query):
+    options=[]
+    if search_query:
+        options=search_by_name(search_query)
+    return options
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
