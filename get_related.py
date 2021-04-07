@@ -32,3 +32,7 @@ def get_related(artist_id,depth,width=0):
 def get_artist(artist_id):
     a = sp.artist(artist_id)
     return {'data': {'id': a['uri'][15:], 'label': a['name'],'url':a['images'][1]['url']}}
+
+def get_detailed_artist(artist_id):
+    a = sp.artist(artist_id)
+    return a
