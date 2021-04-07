@@ -1,6 +1,6 @@
 import dash
 from dash.dependencies import Input, Output,State
-from get_related import get_artist, get_related
+from get_related import get_artist, get_related, get_detailed_artist
 import dash_html_components as html
 import pprint as pp
 import dash_cytoscape as cyto
@@ -17,7 +17,7 @@ app.layout = html.Div(children=[
                     elements=[]
                     )],style={'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
-                        html.Img(height='320',width='320',id='Artist-Image',src='https://i.scdn.co/image/7db34c8aace6feb91f38601bb75e6b3301b4657a'),
+                        html.Img(height='320',width='320',id='Artist-Image',src='/assets\Question-Mark-PNG-Picture.png'),
                         html.Div(id='artist-info')],style={'margin':'auto','width':'50%'}),
                     dcc.Dropdown(
                         id='dropdown-layout',
@@ -51,7 +51,13 @@ def update_cytoscape_layout(layout):
     [Input('cytoscape','mouseoverNodeData')]
 )
 def update_output_div(input_value):
-    return 'Output: {}'.format(input_value)
+    if input_value:
+        l=[]
+        print(input_value)
+        a=get_detailed_artist(input_value['id'])
+        print(a)
+        l.append(html.H3(a['name']))
+        return html.H1(l)
 
 @app.callback(Output('cytoscape', 'elements'),
               [Input('cytoscape', 'tapNodeData'),
@@ -75,6 +81,7 @@ def generate_elements(nodeData,artistURL, elements):
 def generate_image(mouseoverNodeData):
     if mouseoverNodeData:
         return mouseoverNodeData['url']
+    return 'assets\Question-Mark-PNG-Picture.png'
 
 if __name__ == '__main__':
     app.run_server(debug=True)
