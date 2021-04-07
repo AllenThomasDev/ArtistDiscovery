@@ -17,7 +17,7 @@ app.layout = html.Div(children=[
                     elements=[]
                     )],style={'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
-                        html.Img(height='320',width='320',id='Artist-Image',src='/assets\Question-Mark-PNG-Picture.png'),
+                        html.Img(height='320',width='320',id='Artist-Image',src='/assets\images\Question-Mark-PNG-Picture.png'),
                         html.Div(id='artist-info')],style={'margin':'auto','width':'50%'}),
                     dcc.Dropdown(
                         id='dropdown-layout',
@@ -81,7 +81,7 @@ def generate_elements(nodeData,artistURL, elements):
 def generate_image(mouseoverNodeData):
     if mouseoverNodeData:
         return mouseoverNodeData['url']
-    return 'assets\Question-Mark-PNG-Picture.png'
+    return 'assets\images\Question-Mark-PNG-Picture.png'
 
 if __name__ == '__main__':
     app.run_server(debug=True)
