@@ -9,19 +9,45 @@ import dash_cytoscape as cyto
 import string
 import random
 import dash_core_components as dcc
-app = dash.Dash(__name__,suppress_callback_exceptions=True)
-cyto.load_extra_layouts()
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__,suppress_callback_exceptions=True,external_stylesheets=external_stylesheets)
+cyto.load_extra_layouts()
 song_dict={}
+stylesheet = [
+    {
+        'selector': 'node',
+        'style': {
+            'width': 60,
+            'height': 60,
+            'background-fit': 'cover',
+            'background-image': 'data(url)'
+        }},{
+            'selector': 'node',
+            'style': {
+                'content': 'data(label)',
+                'text-halign':'center',
+                'text-valign':'bottom',
+                'text-margin-y':-5,
+                'text-outline-color':'white',
+                'text-outline-width':2
+            }}]
 app.layout = html.Div(children=[
         html.Div(
             children=[html.Div(children=[dcc.Dropdown(id="link-input",style={'width':'100%'}, value='fra',placeholder="Who is your favorite Artist?",options=[],),
                 cyto.Cytoscape(
+                    minZoom=0.5,
+                    maxZoom=3.5,
+                    autounselectify =True,
                     id='cytoscape',
+                    stylesheet=stylesheet,
                     layout={'name': 'breadthfirst'},
                     style={'width': '100%', 'height': '1000px'},
                     elements=[]
-                    )],style={'float':'left','width':'70%'}),
+                    )],style={'backgroundColor': colors['background'],'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
                         html.Img(height='320',width='320',id='Artist-Image',src='/assets\images\Question-Mark-PNG-Picture.png'),
                         html.Audio(id='preview-audio',src='',autoPlay=True,controls=True),
@@ -49,7 +75,7 @@ app.layout = html.Div(children=[
                         ]
                     )],style={'float':'left','width':'30%'})]
                 )
-                    ])
+                    ],style={'backgroundColor': colors['background']})
 
 @app.callback(Output('cytoscape', 'layout'),
               [Input('dropdown-layout', 'value')])
