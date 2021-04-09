@@ -13,6 +13,7 @@ colors = {
     'background': '#111111',
     'text': '#7FDBFF'
 }
+message_node={'data': {'id': 'Base', 'url':0,'label': "Enter you fav artist's name"},'classes': 'message', 'locked': True}
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__,suppress_callback_exceptions=True,external_stylesheets=external_stylesheets)
 cyto.load_extra_layouts()
@@ -25,6 +26,14 @@ stylesheet = [
             'height': 60,
             'background-fit': 'cover',
             'background-image': 'data(url)'
+        }},
+            {
+        'selector': '.message',
+        'style': {
+            'width': 60,
+            'height': 60,
+            'shape':'square',
+            'background-color':colors['background']
         }},{
             'selector': 'node',
             'style': {
@@ -49,8 +58,8 @@ app.layout = html.Div(children=[
                     id='cytoscape',
                     stylesheet=stylesheet,
                     layout={'name': 'breadthfirst'},
-                    style={'width': '100%', 'height': '1000px'},
-                    elements=[]
+                    style={'width': '100%', 'height': '1000px' },
+                    elements=[message_node]
                     )],style={'backgroundColor': colors['background'],'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
                         html.Img(height='320',width='320',id='Artist-Image',src='/assets\images\Question-Mark-PNG-Picture.png'),
@@ -94,17 +103,18 @@ def update_output_div(input_value):
     l=[]
     song_options=[]
     if input_value:
-        a=get_detailed_artist(input_value['id'])
-        l.append(html.H3(f"{a['name']}'s top tracks are -"))
-        for track in get_top_tracks(input_value['id']):
-            disabled=False
-            if track['audio'] == None:
-                track['audio']=''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-                disabled=True
-                pass
-            song_options.append({'label':track['name'],'value':track['audio'],'disabled':disabled})
-    song_options=sorted(song_options, key = lambda i: i['disabled'],reverse=False)
-    l.append(dcc.RadioItems(id='song-list',options=song_options,labelStyle={'display': 'block'}))
+        if(input_value['url']):
+            a=get_detailed_artist(input_value['id'])
+            l.append(html.H3(f"{a['name']}'s top tracks are -"))
+            for track in get_top_tracks(input_value['id']):
+                disabled=False
+                if track['audio'] == None:
+                    track['audio']=''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                    disabled=True
+                    pass
+                song_options.append({'label':track['name'],'value':track['audio'],'disabled':disabled})
+        song_options=sorted(song_options, key = lambda i: i['disabled'],reverse=False)
+        l.append(dcc.RadioItems(id='song-list',options=song_options,labelStyle={'display': 'block'}))
     return l
 
 @app.callback(Output('cytoscape', 'elements'),
@@ -118,13 +128,14 @@ def generate_elements(nodeData,artistURL, nclicks,elements):
         elements = [get_artist(artistURL)]
         pass
     elif ctx.triggered[0]['prop_id']=='cytoscape.tapNodeData':
-        new_nodes,new_edges=get_related(nodeData['id'],10,0)
-        for node in new_nodes:
-            elements.append(node)
-        for edge in new_edges:
-            elements.append(edge)
+        if nodeData['url']:
+            new_nodes,new_edges=get_related(nodeData['id'],10,0)
+            for node in new_nodes:
+                elements.append(node)
+            for edge in new_edges:
+                elements.append(edge)
     elif ctx.triggered[0]['prop_id']=='clear-graph.n_clicks':
-        return []
+        return [message_node]
         pass
     return elements
 
@@ -133,7 +144,8 @@ def generate_elements(nodeData,artistURL, nclicks,elements):
               [Input('cytoscape', 'mouseoverNodeData')])
 def generate_image(mouseoverNodeData):
     if mouseoverNodeData:
-        return mouseoverNodeData['url']
+        if mouseoverNodeData['url']:
+            return mouseoverNodeData['url']
     return 'assets\images\Question-Mark-PNG-Picture.png'
 
 @app.callback(Output('preview-audio', 'src'),
