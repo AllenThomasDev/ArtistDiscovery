@@ -37,7 +37,11 @@ stylesheet = [
             }}]
 app.layout = html.Div(children=[
         html.Div(
-            children=[html.Div(children=[dcc.Dropdown(id="link-input",style={'width':'100%'}, value='fra',placeholder="Who is your favorite Artist?",options=[],),
+            children=[html.Div(children=
+                [html.Div(
+                    children=[
+                        dcc.Dropdown(id="link-input",style={'width':'60%'}, value='fra',placeholder="Who is your favorite Artist?",options=[],),
+                        html.Button('Reset Graph ❌',id="clear-graph")]),
                 cyto.Cytoscape(
                     minZoom=0.5,
                     maxZoom=3.5,
@@ -105,9 +109,10 @@ def update_output_div(input_value):
 
 @app.callback(Output('cytoscape', 'elements'),
               [Input('cytoscape', 'tapNodeData'),
-              Input('link-input', 'value')],
+              Input('link-input', 'value'),
+              Input('clear-graph', 'n_clicks')],
               [State('cytoscape', 'elements')])
-def generate_elements(nodeData,artistURL, elements):
+def generate_elements(nodeData,artistURL, nclicks,elements):
     ctx = dash.callback_context
     if ctx.triggered[0]['prop_id']=='link-input.value':
         elements = [get_artist(artistURL)]
@@ -118,6 +123,9 @@ def generate_elements(nodeData,artistURL, elements):
             elements.append(node)
         for edge in new_edges:
             elements.append(edge)
+    elif ctx.triggered[0]['prop_id']=='clear-graph.n_clicks':
+        return []
+        pass
     return elements
 
 
@@ -140,6 +148,7 @@ def populate_dropdown(search_query):
     if search_query:
         options=search_by_name(search_query)
     return options
+
 
 
 if __name__ == '__main__':
