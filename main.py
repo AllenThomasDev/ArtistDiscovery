@@ -26,18 +26,16 @@ stylesheet = [
             'width': 60,
             'height': 60,
             'background-fit': 'cover',
-            'background-image': 'data(url)'
-        }},
-{
-            'selector': 'node',
-            'style': {
-                'content': 'data(label)',
-                'text-halign':'center',
-                'text-valign':'bottom',
-                'text-margin-y':-5,
-                'text-outline-color':'white',
-                'text-outline-width':2
-            }},            {
+            'background-image': 'data(url)',
+            'content': 'data(label)',
+            'text-halign':'center',
+            'text-valign':'bottom',
+            'text-margin-y':-5,
+            'text-outline-color':'white',
+            'text-outline-width':2
+                }
+    },
+    {
         'selector': '.message',
         'style': {
             'width': 60,
@@ -50,7 +48,9 @@ stylesheet = [
             'text-margin-y':-5,
             'text-outline-color':'white',
             'text-outline-width':0.5
-        }}]
+                }
+    }
+    ]
 app.layout = html.Div(children=[
         html.Div(
             children=[html.Div(children=
@@ -80,13 +80,13 @@ app.layout = html.Div(children=[
                         ,style={'width':'40%'}),
                         html.Button('Reset Graph ❌',id="clear-graph",style={'width':'30%'}),
                         html.H6("Node Size-",style={'color':'white'}),
-                        html.Div(
+                        html.Div(children=[
                             dcc.Slider(
-                            id='my-slider',
+                            id='node-slider',
                             min=1,
                             max=100,
                             step=1,
-                            value=50),style={'width':'50%'}),
+                            value=50)],style={'width':'50%'}),
                             ],style={'width':'60%'}),
                 cyto.Cytoscape(
                     minZoom=0.5,
@@ -181,17 +181,23 @@ def populate_dropdown(search_query):
     return options
 
 @app.callback(Output('cytoscape', 'stylesheet'),
-              [Input('my-slider', 'value')])
-def node_size(value):
-    print(value)
-    stylesheet[0]=    {
+              [Input('node-slider', 'value')])
+def node_size(node_size):
+    stylesheet[0]=     {
         'selector': 'node',
         'style': {
-            'width': value,
-            'height': value,
+            'width': node_size,
+            'height': node_size,
             'background-fit': 'cover',
-            'background-image': 'data(url)'
-        }}
+            'background-image': 'data(url)',
+            'content': 'data(label)',
+            'text-halign':'center',
+            'text-valign':'bottom',
+            'text-margin-y':-5,
+            'text-outline-color':'white',
+            'text-outline-width':2
+                }
+    }
     return stylesheet
 
 
