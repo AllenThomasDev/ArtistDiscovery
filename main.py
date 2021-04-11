@@ -2,6 +2,7 @@ from random import randint, random
 import dash
 from dash.dependencies import Input, Output,State
 from dash_html_components.Audio import Audio
+from dash_html_components.S import S
 from get_related import *
 import dash_html_components as html
 import pprint as pp
@@ -27,14 +28,7 @@ stylesheet = [
             'background-fit': 'cover',
             'background-image': 'data(url)'
         }},
-            {
-        'selector': '.message',
-        'style': {
-            'width': 60,
-            'height': 60,
-            'shape':'square',
-            'background-color':colors['background']
-        }},{
+{
             'selector': 'node',
             'style': {
                 'content': 'data(label)',
@@ -43,14 +37,57 @@ stylesheet = [
                 'text-margin-y':-5,
                 'text-outline-color':'white',
                 'text-outline-width':2
-            }}]
+            }},            {
+        'selector': '.message',
+        'style': {
+            'width': 60,
+            'height': 60,
+            'shape':'square',
+            'background-color':colors['background'],    
+            'content': 'data(label)',
+            'text-halign':'center',
+            'text-valign':'bottom',
+            'text-margin-y':-5,
+            'text-outline-color':'white',
+            'text-outline-width':0.5
+        }}]
 app.layout = html.Div(children=[
         html.Div(
             children=[html.Div(children=
                 [html.Div(
                     children=[
-                        dcc.Dropdown(id="link-input",style={'width':'60%'}, value='fra',placeholder="Who is your favorite Artist?",options=[],),
-                        html.Button('Reset Graph ❌',id="clear-graph")]),
+                        html.Div(children=[
+                        dcc.Dropdown(id="link-input", value='fra',placeholder="Who is your favorite Artist?",options=[],),
+                        dcc.Dropdown(
+                        id='dropdown-layout',
+                        value='cola',
+                        options=[
+                            {'label':'random','value':'random'},
+                            {'label':'grid','value':'grid'},
+                            {'label':'circle','value':'circle'},
+                            {'label':'concentric','value':'concentric'},
+                            {'label':'breadthfirst','value':'breadthfirst'},
+                            {'label':'cose','value':'cose'},
+                            {'label':'cose-bilkent','value':'cose-bilkent'},
+                            {'label':'dagre','value':'dagre'},
+                            {'label':'cola','value':'cola'},
+                            {'label':'klay','value':'klay'},
+                            {'label':'spread','value':'spread'},
+                            {'label':'euler','value':'euler'}
+                                ]
+                                    )
+                        ]
+                        ,style={'width':'40%'}),
+                        html.Button('Reset Graph ❌',id="clear-graph",style={'width':'30%'}),
+                        html.H6("Node Size-",style={'color':'white'}),
+                        html.Div(
+                            dcc.Slider(
+                            id='my-slider',
+                            min=1,
+                            max=100,
+                            step=1,
+                            value=50),style={'width':'50%'}),
+                            ],style={'width':'60%'}),
                 cyto.Cytoscape(
                     minZoom=0.5,
                     maxZoom=3.5,
@@ -68,25 +105,7 @@ app.layout = html.Div(children=[
                             children=[
                                 
                             ],id='artist-info')],style={'margin':'auto','width':'50%'}),
-                    dcc.Dropdown(
-                        id='dropdown-layout',
-                        value='cola',
-                        options=[
-                            {'label':'random','value':'random'},
-                            {'label':'grid','value':'grid'},
-                            {'label':'circle','value':'circle'},
-                            {'label':'concentric','value':'concentric'},
-                            {'label':'breadthfirst','value':'breadthfirst'},
-                            {'label':'cose','value':'cose'},
-                            {'label':'cose-bilkent','value':'cose-bilkent'},
-                            {'label':'dagre','value':'dagre'},
-                            {'label':'cola','value':'cola'},
-                            {'label':'klay','value':'klay'},
-                            {'label':'spread','value':'spread'},
-                            {'label':'euler','value':'euler'}
-
-                        ]
-                    )],style={'float':'left','width':'30%'})]
+                            ],style={'float':'left','width':'30%'})]
                 )
                     ],style={'backgroundColor': colors['background']})
 
@@ -161,6 +180,19 @@ def populate_dropdown(search_query):
         options=search_by_name(search_query)
     return options
 
+@app.callback(Output('cytoscape', 'stylesheet'),
+              [Input('my-slider', 'value')])
+def node_size(value):
+    print(value)
+    stylesheet[0]=    {
+        'selector': 'node',
+        'style': {
+            'width': value,
+            'height': value,
+            'background-fit': 'cover',
+            'background-image': 'data(url)'
+        }}
+    return stylesheet
 
 
 if __name__ == '__main__':
