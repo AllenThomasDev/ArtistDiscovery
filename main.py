@@ -49,7 +49,12 @@ stylesheet = [
             'text-outline-color':'white',
             'text-outline-width':0.5
                 }
-    }
+    },
+    {    
+                    'selector': 'edge',
+                    'style': {
+                            'width': 1
+                                }}
     ]
 app.layout = html.Div(children=[
         html.Div(
@@ -87,6 +92,14 @@ app.layout = html.Div(children=[
                             max=100,
                             step=1,
                             value=50)],style={'width':'50%'}),
+                        html.H6("Edge Width-",style={'color':'white'}),
+                        html.Div(children=[
+                            dcc.Slider(
+                            id='edge-slider',
+                            min=0,
+                            max=10,
+                            step=0.1,
+                            value=5)],style={'width':'50%'}),
                             ],style={'width':'60%'}),
                 cyto.Cytoscape(
                     minZoom=0.5,
@@ -181,8 +194,9 @@ def populate_dropdown(search_query):
     return options
 
 @app.callback(Output('cytoscape', 'stylesheet'),
-              [Input('node-slider', 'value')])
-def node_size(node_size):
+              [Input('node-slider', 'value'),
+              Input('edge-slider', 'value')])
+def node_size(node_size,edge_width):
     stylesheet[0]=     {
         'selector': 'node',
         'style': {
@@ -198,6 +212,11 @@ def node_size(node_size):
             'text-outline-width':2
                 }
     }
+    stylesheet[2]={    
+                    'selector': 'edge',
+                    'style': {
+                            'width': edge_width
+                                }}
     return stylesheet
 
 
