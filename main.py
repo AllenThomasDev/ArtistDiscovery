@@ -2,6 +2,7 @@ from random import randint, random
 import dash
 from dash.dependencies import Input, Output,State
 from dash_html_components.Audio import Audio
+from dash_html_components.Div import Div
 from dash_html_components.S import S
 from get_related import *
 import dash_html_components as html
@@ -26,6 +27,7 @@ stylesheet = [
             'width': 60,
             'height': 60,
             'background-fit': 'cover',
+            'font-size':20,
             'background-image': 'data(url)',
             'content': 'data(label)',
             'text-halign':'center',
@@ -41,6 +43,7 @@ stylesheet = [
             'width': 60,
             'height': 60,
             'shape':'square',
+            'font-size':60,
             'background-color':colors['background'],    
             'content': 'data(label)',
             'text-halign':'center',
@@ -84,31 +87,43 @@ app.layout = html.Div(children=[
                         ]
                         ,style={'width':'40%'}),
                         html.Button('Reset Graph ❌',id="clear-graph",style={'width':'30%'}),
-                        html.H6("Node Size-",style={'color':'white'}),
                         html.Div(children=[
-                            dcc.Slider(
-                            id='node-slider',
-                            min=1,
-                            max=100,
-                            step=1,
-                            value=50)],style={'width':'50%'}),
-                        html.H6("Edge Width-",style={'color':'white'}),
-                        html.Div(children=[
-                            dcc.Slider(
-                            id='edge-slider',
-                            min=0,
-                            max=10,
-                            step=0.1,
-                            value=5)],style={'width':'50%'}),
-                            ],style={'width':'60%'}),
+                            html.Div(children=[
+                                    html.H6("Node Size-",style={'color':'white'}),
+                                    html.Div(children=[
+                                        dcc.Slider(
+                                        id='node-slider',
+                                        min=0,
+                                        max=100,
+                                        step=1,
+                                        value=60)])],className="four columns"),
+                            html.Div(children=[
+                                html.H6("Label Size-",style={'color':'white'}),
+                                html.Div(children=[
+                                    dcc.Slider(
+                                    id='label-slider',
+                                    min=0,
+                                    max=50,
+                                    step=1,
+                                    value=20)])],className="four columns"),
+                            html.Div(children=[
+                                html.H6("Edge Width-",style={'color':'white'}),
+                                html.Div(children=[
+                                    dcc.Slider(
+                                    id='edge-slider',
+                                    min=0,
+                                    max=10,
+                                    step=0.1,
+                                    value=5)])],className="four columns")],className="row"),
+                            ],style={'width':'100%'}),
                 cyto.Cytoscape(
-                    minZoom=0.5,
+                    minZoom=0.25,
                     maxZoom=3.5,
                     autounselectify =True,
                     id='cytoscape',
                     stylesheet=stylesheet,
                     layout={'name': 'breadthfirst'},
-                    style={'width': '100%', 'height': '1000px' },
+                    style={'width': '100%', 'height': '800px' },
                     elements=[message_node]
                     )],style={'backgroundColor': colors['background'],'float':'left','width':'70%'}),
                     html.Div(children=[html.Div(id='artist-info-div', children=[
@@ -195,21 +210,23 @@ def populate_dropdown(search_query):
 
 @app.callback(Output('cytoscape', 'stylesheet'),
               [Input('node-slider', 'value'),
+              Input('label-slider', 'value'),
               Input('edge-slider', 'value')])
-def node_size(node_size,edge_width):
+def node_size(node_size,label_size,edge_width):
     stylesheet[0]=     {
         'selector': 'node',
         'style': {
             'width': node_size,
             'height': node_size,
             'background-fit': 'cover',
+            'font-size':label_size,
             'background-image': 'data(url)',
             'content': 'data(label)',
             'text-halign':'center',
             'text-valign':'bottom',
             'text-margin-y':-5,
             'text-outline-color':'white',
-            'text-outline-width':2
+            'text-outline-width':label_size/10
                 }
     }
     stylesheet[2]={    
